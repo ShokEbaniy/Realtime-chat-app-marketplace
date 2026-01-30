@@ -12,7 +12,6 @@ import { Loader } from "lucide-react";
 import { useThemesStore } from "./store/useThemesStore.js";
 import ChatsPage from "./Pages/ChatsPage.jsx";
 import TabsBar from "./Components/TabsBar.jsx";
-import { Tabs } from "@chakra-ui/react";
 function App() {
   const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
   const { theme } = useThemesStore();

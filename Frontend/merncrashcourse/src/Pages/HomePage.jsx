@@ -1,22 +1,12 @@
 import React, { useEffect } from "react";
 import ProductCard from "../Components/ProductCard.jsx";
 import { useProductStore } from "../store/product";
-import {
-  Container,
-  useColorModeValue,
-  Text,
-  SimpleGrid,
-  Link as ChakraLink,
-} from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 
 const HomePage = () => {
-  const textColor = useColorModeValue("gray.600", "gray.400");
-  const cardBg = useColorModeValue("gray.200", "gray.800");
-
   const products = useProductStore((s) => s.products);
   const loading = useProductStore((s) => s.loading);
-  const fetchProducts = useProductStore((s) =>s.fetchProducts);
+  const fetchProducts = useProductStore((s) => s.fetchProducts);
   const removeProduct = useProductStore((s) => s.removeProduct);
 
   useEffect(() => {
@@ -24,40 +14,37 @@ const HomePage = () => {
   }, [fetchProducts]);
 
   return (
-    <Container maxW="container.lg" mt={{ base: 4, md: 8 }} pb={{ base: 28, md: 8 }}>
-      <Text fontSize="4xl" fontWeight="bold" mb={6} textAlign="center">
+    <div className="container mx-auto max-w-7xl px-4 mt-4 md:mt-8 pb-28 md:pb-8">
+      <h1 className="text-4xl font-bold mb-6 text-center">
         товары
-      </Text>
+      </h1>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
       ) : products.length === 0 ? (
-        <Text textAlign="center" color={textColor} fontSize="lg">
+        <p className="text-center text-base-content/60 text-lg">
           товаров нет{" "}
-          <ChakraLink
-            as={NavLink}
+          <NavLink
             to="/create"
-            color="teal.400"
-            fontWeight="semibold"
+            className="text-primary font-semibold hover:underline"
           >
             создать?
-          </ChakraLink>
-        </Text>
+          </NavLink>
+        </p>
       ) : (
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {products.map((p) => (
             <ProductCard
               key={p._id}
               product={p}
               removeProduct={removeProduct}
-              cardBg={cardBg}
             />
           ))}
-        </SimpleGrid>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

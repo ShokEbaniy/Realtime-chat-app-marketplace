@@ -55,13 +55,19 @@ export const useChatStore = create(
       setSelectedUser: (user) => set({ selectedUser: user }),
       subscribeToMessages: () => {
         const socket = useAuthStore.getState().socket;
+        if (!socket) return;
+        
+        socket.off("newMessage");
+        
         socket.on("newMessage", (message) => {
-          if(message.senderId !== get().selectedUser._id) return;
+          const selectedUser = get().selectedUser;
+          if (!selectedUser || message.senderId !== selectedUser._id) return;
           set({ messages: [...get().messages, message] });
         });
       },
       unsubscribeToMessages: () => {
         const socket = useAuthStore.getState().socket;
+        if (!socket) return;
         socket.off("newMessage");
       },
     }),

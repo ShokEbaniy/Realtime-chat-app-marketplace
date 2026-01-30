@@ -2,177 +2,143 @@ import React from "react";
 import { FaEdit } from "react-icons/fa";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { useProductStore } from "../store/product";
-import {
-  Container,
-  Text,
-  Button,
-  Box,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  useToast,
-  useDisclosure,
-  Input,
-  useColorModeValue,
-  VStack,
-} from "@chakra-ui/react";
+import toast from "react-hot-toast";
 
-const ProductCard = ({ product, removeProduct, cardBg }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const ProductCard = ({ product, removeProduct }) => {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { updateProduct } = useProductStore();
   const [updatedProduct, setUpdatedProduct] = React.useState({
     name: product.name,
     price: product.price,
     image: product.image,
   });
-  const toast = useToast();
+
+  const handleUpdate = async () => {
+    setIsModalOpen(false);
+    const updated = await updateProduct(
+      product._id || product.id,
+      updatedProduct
+    );
+    if (updated.success) {
+      toast.success("товар обновлен");
+    } else {
+      toast.error(updated.message || "ошибка обновления");
+    }
+  };
+
+  const handleDelete = async () => {
+    const removed = await removeProduct(product._id || product.id);
+    if (removed.success) {
+      toast.success(`товар ${product.name} удален`);
+    } else {
+      toast.error(removed.message || "ошибка удаления");
+    }
+  };
+
   return (
-    <Box
-      key={product._id || product.id}
-      bg={cardBg}
-      p={4}
-      borderRadius="md"
-      transition="0.3s ease-in-out"
-      _hover={{
-        boxShadow: "md",
-        transform: "scale(1.01) translateY(-2px)",
-      }}
-    >
-      <Text fontSize="sm" color="gray.500" noOfLines={1}>
-        {product.image}
-      </Text>
-      <Text fontWeight="bold">{product.name}</Text>
-      <Text>{product.price}</Text>
+    <>
+      <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
+        <div className="card-body">
+          <p className="text-sm text-base-content/40 truncate">
+            {product.image}
+          </p>
+          <h2 className="card-title">{product.name}</h2>
+          <p className="text-lg font-semibold text-primary">{product.price} ₸</p>
 
-      <Button mt={3} mr={2} onClick={onOpen}>
-        <FaEdit />
-      </Button>
-      <Button
-        mt={3}
-        colorScheme="red"
-        onClick={async () => {
-          const removed = await removeProduct(product._id || product.id);
-          if (removed.success) {
-            toast({
-              title: `Product ${product.name} removed.`,
-              status: "success",
-              duration: 3000,
-              isClosable: true,
-            });
-          } else {
-            toast({
-              title: "Error removing product.",
-              description: removed.message,
-              status: "error",
-              duration: 3000,
-              isClosable: true,
-            });
-          }
-        }}
-      >
-        <FaRegTrashCan />
-      </Button>
-
-
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Product</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <VStack spacing={3}>
-              <Input
-                borderColor={useColorModeValue("gray.300", "gray.600")}
-                focusBorderColor="green.500"
-                name="productName"
-                value={updatedProduct.name}
-                onChange={(e) =>
-                  setUpdatedProduct({
-                    ...updatedProduct,
-                    name: e.target.value,
-                  })
-                }
-                placeholder="Product Name"
-                _placeholder={{
-                  color: useColorModeValue("gray.400", "gray.500"),
-                }}
-              />
-              <Input
-                borderColor={useColorModeValue("gray.300", "gray.600")}
-                focusBorderColor="green.500"
-                name="productPrice"
-                value={updatedProduct.price}
-                onChange={(e) =>
-                  setUpdatedProduct({
-                    ...updatedProduct,
-                    price: e.target.value,
-                  })
-                }
-                type="number"
-                placeholder="Product Price in Tenge"
-                _placeholder={{
-                  color: useColorModeValue("gray.400", "gray.500"),
-                }}
-              />
-              <Input
-                borderColor={useColorModeValue("gray.300", "gray.600")}
-                focusBorderColor="green.500"
-                name="productImage"
-                value={updatedProduct.image}
-                onChange={(e) =>
-                  setUpdatedProduct({
-                    ...updatedProduct,
-                    image: e.target.value,
-                  })
-                }
-                placeholder="Product Image URL"
-                _placeholder={{
-                  color: useColorModeValue("gray.400", "gray.500"),
-                }}
-              />
-            </VStack>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={async () => {
-                onClose();
-                const updated = await updateProduct(
-                  product._id || product.id,
-                  updatedProduct
-                );
-                if (updated.success) {
-                  toast({
-                    title: "Product updated.",
-                    status: "success",
-                    duration: 3000,
-                    isClosable: true,
-                  });
-                } else {
-                  toast({
-                    title: "Error updating product.",
-                    description: updated.message,
-                    status: "error",
-                    duration: 3000,
-                    isClosable: true,
-                  });
-                }
-              }}
+          <div className="card-actions justify-end mt-4">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="btn btn-sm btn-ghost"
             >
-              Save
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Box>
+              <FaEdit />
+            </button>
+            <button
+              onClick={handleDelete}
+              className="btn btn-sm btn-error"
+            >
+              <FaRegTrashCan />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">редактировать товар</h3>
+            
+            <div className="space-y-4">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">название</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="название товара"
+                  className="input input-bordered focus:input-primary"
+                  value={updatedProduct.name}
+                  onChange={(e) =>
+                    setUpdatedProduct({
+                      ...updatedProduct,
+                      name: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">цена</span>
+                </label>
+                <input
+                  type="number"
+                  placeholder="цена в тенге"
+                  className="input input-bordered focus:input-primary"
+                  value={updatedProduct.price}
+                  onChange={(e) =>
+                    setUpdatedProduct({
+                      ...updatedProduct,
+                      price: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">картинка</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="ссылка на фото"
+                  className="input input-bordered focus:input-primary"
+                  value={updatedProduct.image}
+                  onChange={(e) =>
+                    setUpdatedProduct({
+                      ...updatedProduct,
+                      image: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="modal-action">
+              <button onClick={handleUpdate} className="btn btn-primary">
+                сохранить
+              </button>
+              <button onClick={() => setIsModalOpen(false)} className="btn">
+                отмена
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setIsModalOpen(false)}>close</button>
+          </form>
+        </dialog>
+      )}
+    </>
   );
 };
 

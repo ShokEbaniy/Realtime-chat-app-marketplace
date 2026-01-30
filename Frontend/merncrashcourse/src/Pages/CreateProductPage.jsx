@@ -1,16 +1,7 @@
-import {
-  Container,
-  useColorModeValue,
-  Text,
-  Center,
-  Input,
-  VStack,
-  Button,
-  useToast,
-} from "@chakra-ui/react";
 import React from "react";
 import { useState } from "react";
 import { useProductStore } from "../store/product.js";
+import toast from "react-hot-toast";
 
 const CreateProductPage = () => {
   const [productDetails, setProductDetails] = useState({
@@ -18,81 +9,83 @@ const CreateProductPage = () => {
     price: "",
     image: "",
   });
-  const toast = useToast();
+  
   const addProduct = useProductStore((state) => state.addProduct);
 
   const handleAddProduct = async () => {
     const { success, message } = await addProduct(productDetails);
     if (success) {
-      toast({
-        title: "Success",
-        description: message,
-        status: "success",
-        isClosable: true,
-      });
+      toast.success(message || "товар создан");
       setProductDetails({ name: "", price: "", image: "" });
     } else {
-      toast({
-        title: "Error",
-        description: message,
-        status: "error",
-        isClosable: true,
-      });
+      toast.error(message || "ошибка при создании");
     }
   };
 
   return (
-    <Container
-      maxW={"container.lg"}
-      bg={useColorModeValue("gray.200", "gray.800")}
-      p={6}
-      borderRadius="md"
-      alignItems={"center"}
-    >
-      <VStack spacing={6}>
-        <Text fontSize="2xl" fontWeight="bold" mb={4} textAlign="center">
-          Create New Product
-        </Text>
-        <Input
-          borderColor={useColorModeValue("gray.300", "gray.600")}
-          focusBorderColor="green.500"
-          name="productName"
-          value={productDetails.name}
-          onChange={(e) =>
-            setProductDetails({ ...productDetails, name: e.target.value })
-          }
-          placeholder="Product Name"
-          _placeholder={{ color: useColorModeValue("gray.400", "gray.500") }}
-        />
-        <Input
-          borderColor={useColorModeValue("gray.300", "gray.600")}
-          focusBorderColor="green.500"
-          name="productPrice"
-          value={productDetails.price}
-          onChange={(e) =>
-            setProductDetails({ ...productDetails, price: e.target.value })
-          }
-          type="number"
-          placeholder="Product Price in Tenge"
-          _placeholder={{ color: useColorModeValue("gray.400", "gray.500") }}
-        />
-        <Input
-          borderColor={useColorModeValue("gray.300", "gray.600")}
-          focusBorderColor="green.500"
-          name="productImage"
-          value={productDetails.image}
-          onChange={(e) =>
-            setProductDetails({ ...productDetails, image: e.target.value })
-          }
-          placeholder="Product Image URL"
-          _placeholder={{ color: useColorModeValue("gray.400", "gray.500") }}
-        />
+    <div className="container mx-auto max-w-2xl px-4 mt-8 pb-28 md:pb-8">
+      <div className="card bg-base-200 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title text-3xl font-bold text-center justify-center mb-6">
+            создать товар
+          </h2>
+          
+          <div className="space-y-4">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">название</span>
+              </label>
+              <input
+                type="text"
+                placeholder="введи название"
+                className="input input-bordered w-full focus:input-primary"
+                value={productDetails.name}
+                onChange={(e) =>
+                  setProductDetails({ ...productDetails, name: e.target.value })
+                }
+              />
+            </div>
 
-        <Button colorScheme="green" width="full" onClick={handleAddProduct}>
-          Create Product
-        </Button>
-      </VStack>
-    </Container>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">цена</span>
+              </label>
+              <input
+                type="number"
+                placeholder="цена в тенге"
+                className="input input-bordered w-full focus:input-primary"
+                value={productDetails.price}
+                onChange={(e) =>
+                  setProductDetails({ ...productDetails, price: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">картинка</span>
+              </label>
+              <input
+                type="text"
+                placeholder="ссылка на фото"
+                className="input input-bordered w-full focus:input-primary"
+                value={productDetails.image}
+                onChange={(e) =>
+                  setProductDetails({ ...productDetails, image: e.target.value })
+                }
+              />
+            </div>
+
+            <button
+              onClick={handleAddProduct}
+              className="btn btn-primary w-full mt-4"
+            >
+              создать
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
