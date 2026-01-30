@@ -10,9 +10,14 @@ export const server = http.createServer(app);
 
 export const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin:
+      import.meta.env.MODE === "development"
+        ? "http://localhost:5173"
+        : import.meta.env.VITE_SOCKET_URL,
     credentials: true,
   },
+  transports: ["websocket", "polling"],
+  maxHttpBufferSize: 1e7,
 });
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
