@@ -33,7 +33,7 @@ function App() {
     <div data-theme={theme}>
       <Navbar />
       <TabsBar />
-      <Routes>
+      <Routes className="overflow-hidden">
         <Route
           path="/"
           element={authUser ? <HomePage /> : <Navigate to="/login" />}

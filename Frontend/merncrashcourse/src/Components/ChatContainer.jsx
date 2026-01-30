@@ -10,6 +10,8 @@ import { formatTime } from "../utils/timeFormat";
 const ChatContainer = () => {
   const { authUser } = useAuthStore();
   const {
+    subscribeToMessages,
+    unsubscribeToMessages,
     selectedUser,
     messages,
     isMessagesLoading,
@@ -19,21 +21,28 @@ const ChatContainer = () => {
 
   const listRef = React.useRef(null);
 
-  React.useLayoutEffect(() => {
-    const el = listRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, [messages.length]);
-
   React.useEffect(() => {
     if (selectedUser) {
       getMessages();
     }
-  }, [selectedUser._id, getMessages]);
+    subscribeToMessages();
+    return () => {
+      unsubscribeToMessages();
+    };
+  }, [
+    selectedUser._id,
+    getMessages,
+    subscribeToMessages,
+    unsubscribeToMessages,
+  ]);
+  React.useEffect(() => {
+    if (listRef.current && messages)
+      listRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   if (isMessagesLoading) {
     return (
-      <div className="flex-1 relative flex flex-col overflow-auto">
+      <div className="flex-1 relative flex flex-col overflow-x-hidden overflow-y-hidden">
         <MessageHeader user={selectedUser} />
         <MessageSkeleton />
         <MessageInput />
@@ -42,15 +51,13 @@ const ChatContainer = () => {
   }
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col overflow-x-hidden  ">
+    <div className="flex-1 min-h-0 flex flex-col overflow-x-hidden overflow-y-hidden relative">
       <MessageHeader user={selectedUser} />
-      <div
-        ref={listRef}
-        className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 mt-20 mb-32 "
-      >
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 mt-20 mb-32 max-h-screen ">
         {messages.map((message) => (
           <div
             key={message._id}
+            ref={listRef}
             className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
           >
             <div className="chat-image avatar">

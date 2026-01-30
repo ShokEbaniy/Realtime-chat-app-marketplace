@@ -3,15 +3,20 @@ import http from "http";
 import express from "express";
 
 export const app = express();
+
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 export const server = http.createServer(app);
 
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
     credentials: true,
   },
 });
-
+export function getReceiverSocketId(userId) {
+  return userSocketMap[userId];
+}
 const userSocketMap = {};
 
 io.on("connection", (socket) => {

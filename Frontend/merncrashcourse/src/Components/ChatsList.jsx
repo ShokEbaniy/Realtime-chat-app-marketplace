@@ -7,6 +7,9 @@ const ChatsList = () => {
     useChatStore();
 
   const { onlineUsers } = useAuthStore();
+  const [showOnlineUsersOnly, setShowOnlineUsersOnly] = React.useState(false);
+
+  const filteredUsers = showOnlineUsersOnly ? users.filter((user) => onlineUsers.includes(user._id)) : users;
 
   React.useEffect(() => {
     getUsers();
@@ -24,15 +27,17 @@ const ChatsList = () => {
         <div className="p-4 border-b flex-col w-full h-full gap-4 overflow-y-auto ">
           <h2 className="text-xl font-semibold mb-4">Chats</h2>
           <label className="cursor-pointer">
-            <input type="radio" name="size" className="sr-only" />
-            <span
-              className={`px-2 py-2 rounded border select-none inline-block
-               "bg-white text-gray-800 border-gray-300"}
-            `}
-            ></span>
+            <input
+              type="checkbox"
+              checked={showOnlineUsersOnly}
+              onChange={() => setShowOnlineUsersOnly((v) => !v)}
+              className=" checkbox checkbox-sm"
+            />
+
+            <span> ({onlineUsers.length - 1} Online)</span>
           </label>
           <div>{/*TO DO: make a online users only filter */}</div>
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <div
               key={user._id}
               onClick={() => handleSelectUser(user)}
