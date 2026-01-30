@@ -6,7 +6,12 @@ import { io } from "socket.io-client";
 const BASE_URL =
   import.meta.env.MODE === "development"
     ? "http://localhost:5001/api"
-    : import.meta.env.VITE_SOCKET_URL;
+    : import.meta.env.VITE_API_URL;
+
+const SOCKET_URL =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5001"
+    : import.meta.env.VITE_SOCKET_URL || "https://saveheal-store.onrender.com";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -99,12 +104,24 @@ export const useAuthStore = create((set, get) => ({
     const { authUser, socket } = get();
     if (!authUser || socket?.connected) return;
 
-    const newSocket = io(BASE_URL, {
+    const newSocket = io(SOCKET_URL, {
       withCredentials: true,
       query: { userId: authUser._id },
+      transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
     });
 
     set({ socket: newSocket });
+
+    newSocket.on("connect", () => {
+      console.log("✅ Socket connected:", newSocket.id);
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.error("❌ Socket connection error:", error);
+    });
 
     newSocket.on("getOnlineUsers", (users) => {
       set({ onlineUsers: users });

@@ -23,7 +23,10 @@ connectDB();
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:5173"
+        : process.env.CLIENT_URL || "https://saveheal-store.onrender.com",
     credentials: true,
   }),
 );

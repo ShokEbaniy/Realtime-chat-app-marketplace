@@ -11,9 +11,9 @@ export const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
     origin:
-      import.meta.env.MODE === "development"
+      process.env.NODE_ENV === "development"
         ? "http://localhost:5173"
-        : import.meta.env.VITE_SOCKET_URL,
+        : process.env.CLIENT_URL || "https://saveheal-store.onrender.com",
     credentials: true,
   },
   transports: ["websocket", "polling"],
@@ -25,14 +25,19 @@ export function getReceiverSocketId(userId) {
 const userSocketMap = {};
 
 io.on("connection", (socket) => {
-  console.log("a user connected" + socket.id);
+  console.log("✅ User connected:", socket.id);
+  console.log("Query params:", socket.handshake.query);
 
   const userId = socket.handshake.query.userId;
-  if (userId) userSocketMap[userId] = socket.id;
+  if (userId) {
+    userSocketMap[userId] = socket.id;
+    console.log(`Mapped user ${userId} to socket ${socket.id}`);
+  }
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
+  
   socket.on("disconnect", () => {
-    console.log("a user disconnected" + socket.id);
+    console.log("❌ User disconnected:", socket.id);
     delete userSocketMap[userId];
 
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
