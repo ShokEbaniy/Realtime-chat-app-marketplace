@@ -14,28 +14,30 @@ const MessageInput = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
-    if (isSending) return; // Prevent multiple sends
+    if (isSending) return;
 
+    setIsSending(true);
     try {
-      setIsSending(true);
-      await sendMessage({
+      const success = await sendMessage({
         text: text.trim(),
         image: imagePreview,
       });
-      setText("");
-      setImagePreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = null;
+
+      if (success) {
+        setText("");
+        setImagePreview(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = null;
+        }
       }
     } catch (err) {
-      console.log(err);
-      toast.error(err.response?.data?.message || "Не удалось отправить сообщение");
+      console.log("Error sending message:", err);
     } finally {
       setIsSending(false);
     }
   };
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -71,7 +73,6 @@ const MessageInput = () => {
             type="button"
             onClick={removeImagePreview}
             className="absolute -top-2 -right-2 bg-error text-error-content size-6 rounded-full flex items-center justify-center hover:bg-error/80 transition-colors"
-            disabled={isSending}
           >
             <X className="size-4" />
           </button>
@@ -85,7 +86,6 @@ const MessageInput = () => {
           onChange={(e) => setText(e.target.value)}
           placeholder="пиши сюда"
           className="input input-bordered flex-1 text-sm"
-          disabled={isSending}
         />
         
         <input
@@ -94,7 +94,6 @@ const MessageInput = () => {
           accept="image/*"
           className="hidden"
           ref={fileInputRef}
-          disabled={isSending}
         />
         
         <button

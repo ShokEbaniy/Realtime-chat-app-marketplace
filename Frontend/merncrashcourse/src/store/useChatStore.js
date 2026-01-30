@@ -46,9 +46,11 @@ export const useChatStore = create(
             { text, image },
           );
           set((state) => ({ messages: [...state.messages, res.data.message] }));
+          return true;
         } catch (err) {
           console.log(err);
-          toast.error(err.response?.data?.message || "Failed to send message");
+          toast.error(err.response?.data?.message || "Не удалось отправить сообщение");
+          return false;
         }
       },
 
