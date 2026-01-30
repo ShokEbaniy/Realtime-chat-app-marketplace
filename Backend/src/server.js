@@ -46,3 +46,7 @@ if (process.env.NODE_ENV === "production") {
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+// Увеличиваем таймауты для Render/Load Balancer (502/504 fix)
+server.keepAliveTimeout = 120 * 1000;
+server.headersTimeout = 120 * 1000;
