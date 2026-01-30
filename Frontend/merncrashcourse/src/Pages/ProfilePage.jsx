@@ -8,6 +8,7 @@ const ProfilePage = () => {
     userName: authUser.userName,
   });
   const [selectedImg, setSelectedImg] = React.useState(null);
+  
   const handleProfilePicChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -18,86 +19,112 @@ const ProfilePage = () => {
       setSelectedImg(reader.result);
       await updateProfile({ profilePic: reader.result });
     };
-
-    const handleFormDataChange = async (e) => {
-      setForm({ ...form, [e.target.name]: e.target.value });
-      await updateProfile({ [e.target.type === "email" ? "email" : "userName"]: e.target.value });
-    }
   };
+
+  const handleFormDataChange = async (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    await updateProfile({ 
+      [e.target.type === "email" ? "email" : "userName"]: e.target.value 
+    });
+  };
+
   return (
-    <div className="flex items-start justify-center h-screen">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg  w-[80%] ">
-        <div className="flex flex-col items-center">
-          <h1 className="text-2xl font-bold ">Profile</h1>
-          <h4 className="text-md mb-6 text-gray-600/50 dark:text-gray-300/50  text-center px-4">
-            Your profile information
-          </h4>
-          <div className="relative">
-            <img
-              className="w-32 h-32 rounded-full object-cover border-4 border-green-500"
-              src={selectedImg || authUser.profilePic}
-              alt="ProfilePic"
-            />
-            <label
-              htmlFor="profilePic"
-              className="absolute bottom-[-10px] right-[-15px] cursor-pointer bg-gray-400 rounded-full p-1"
-            >
-              <Camera className="text-gray-700 size-12" />
-              <input
-                type="file"
-                id="profilePic"
-                className="hidden"
-                accept="image/*"
-                onChange={handleProfilePicChange}
-              />
-            </label>
+    <div className="container mx-auto max-w-2xl px-4 mt-8 pb-28 md:pb-8">
+      <div className="card bg-base-200 shadow-xl">
+        <div className="card-body">
+          <div className="flex flex-col items-center mb-6">
+            <h1 className="text-3xl font-bold mb-2">профиль</h1>
+            <p className="text-base-content/60 text-center">
+              твоя инфа
+            </p>
           </div>
-          <p>{isUpdatingProfile && "Updating..."}</p>
-        </div>
-        <div className="flex flex-col items-start justify-start mt-8">
-          <div className="flex items-center justify-start gap-2 mb-6">
-            <User className="text-gray-700 size-12 " />
-            <span className="font-bold text-gray-700 dark:text-gray-300">
-              {authUser.userName}
-            </span>
-            <button type="button" className="size-12" onClick={() => {}}>
-              <Check className="text-gray-400 size-12 hover:text-green-500" />
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <Mail className="text-gray-700 size-12" />
-            <input
-              type="email"
-              className="bg-transparent border-b border-gray-400 focus:outline-none focus:border-green-500 text-gray-700 dark:text-gray-300"
-              value={authUser.email}
-            />{" "}
-            
-          </div>
-        </div>
-        <div className="my-4 items-center text-center font-semibold ">
-          Account additional info
-        </div>
-        <div className="flex gap-2 ">
-          Account created at:{" "}
-          <span className="font-semibold mx-2">
-            {authUser.createdAt.split("T")[0]}
-          </span>
-        </div>
-        <div className="flex gap-2 ">
-          Last updated at:{" "}
-          <span className="font-semibold mx-2">
-            {authUser.updatedAt.split("T")[0]}
-          </span>
-        </div>
-        <div className="flex gap-2 ">
-          Account status:{" "}
-          <span className="font-semibold mx-2">
-            {authUser ? (
-              <span className="text-green-600">Active</span>
-            ) : (
-              <span className="text-yellow-600">Restricted</span>
+
+          {/* Profile Picture */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative">
+              <div className="avatar">
+                <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                  <img
+                    src={selectedImg || authUser.profilePic}
+                    alt="профиль"
+                  />
+                </div>
+              </div>
+              <label
+                htmlFor="profilePic"
+                className="absolute bottom-0 right-0 btn btn-circle btn-sm btn-primary cursor-pointer"
+              >
+                <Camera className="size-4" />
+                <input
+                  type="file"
+                  id="profilePic"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleProfilePicChange}
+                />
+              </label>
+            </div>
+            {isUpdatingProfile && (
+              <p className="mt-2 text-sm text-base-content/60">обновление...</p>
             )}
-          </span>
+          </div>
+
+          {/* User Info */}
+          <div className="space-y-6">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text flex items-center gap-2">
+                  <User className="size-5" />
+                  имя
+                </span>
+              </label>
+              <input
+                type="text"
+                className="input input-bordered"
+                value={authUser.userName}
+                readOnly
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text flex items-center gap-2">
+                  <Mail className="size-5" />
+                  почта
+                </span>
+              </label>
+              <input
+                type="email"
+                className="input input-bordered"
+                value={authUser.email}
+                readOnly
+              />
+            </div>
+          </div>
+
+          {/* Account Info */}
+          <div className="divider mt-8">инфа об аккаунте</div>
+
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-base-content/60">создан:</span>
+              <span className="font-semibold">
+                {authUser.createdAt.split("T")[0]}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-base-content/60">обновлен:</span>
+              <span className="font-semibold">
+                {authUser.updatedAt.split("T")[0]}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-base-content/60">статус:</span>
+              <span className="badge badge-success">активен</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

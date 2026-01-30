@@ -7,14 +7,17 @@ const MessageInput = () => {
   const { sendMessage } = useChatStore();
   const [text, setText] = React.useState("");
   const [imagePreview, setImagePreview] = React.useState(null);
+  const [isSending, setIsSending] = React.useState(false);
 
   const fileInputRef = React.useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
+    if (isSending) return; // Prevent multiple sends
 
     try {
+      setIsSending(true);
       await sendMessage({
         text: text.trim(),
         image: imagePreview,
@@ -27,6 +30,8 @@ const MessageInput = () => {
     } catch (err) {
       console.log(err);
       toast.error(err.response?.data?.message || "Не удалось отправить сообщение");
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -66,6 +71,7 @@ const MessageInput = () => {
             type="button"
             onClick={removeImagePreview}
             className="absolute -top-2 -right-2 bg-error text-error-content size-6 rounded-full flex items-center justify-center hover:bg-error/80 transition-colors"
+            disabled={isSending}
           >
             <X className="size-4" />
           </button>
@@ -79,6 +85,7 @@ const MessageInput = () => {
           onChange={(e) => setText(e.target.value)}
           placeholder="пиши сюда"
           className="input input-bordered flex-1 text-sm"
+          disabled={isSending}
         />
         
         <input
@@ -87,6 +94,7 @@ const MessageInput = () => {
           accept="image/*"
           className="hidden"
           ref={fileInputRef}
+          disabled={isSending}
         />
         
         <button
@@ -94,17 +102,22 @@ const MessageInput = () => {
           onClick={() => fileInputRef.current?.click()}
           className="btn btn-circle btn-ghost"
           title="прикрепи фото"
+          disabled={isSending}
         >
           <Image className="w-5 h-5" />
         </button>
         
         <button
           type="submit"
-          disabled={!text.trim() && !imagePreview}
+          disabled={(!text.trim() && !imagePreview) || isSending}
           className="btn btn-primary btn-circle"
           title="отправить"
         >
-          <Send className="w-5 h-5" />
+          {isSending ? (
+            <span className="loading loading-spinner loading-sm"></span>
+          ) : (
+            <Send className="w-5 h-5" />
+          )}
         </button>
       </form>
     </div>
