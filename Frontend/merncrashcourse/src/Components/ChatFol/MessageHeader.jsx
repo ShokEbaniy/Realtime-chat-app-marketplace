@@ -7,18 +7,26 @@ const MessageHeader = ({ user }) => {
   const { onlineUsers } = useAuthStore();
   const isOnline = onlineUsers.includes(user._id);
   return (
-    <div className="flex absolute items-center w-screen p-2 border-b border-gray-700">
-      <button onClick={() => setSelectedUser(null)} className="p-2">
-        <ArrowLeft className="w-10 h-10" />
+    <div className="flex items-center gap-3 p-4 border-b border-base-300 bg-base-100">
+      <button 
+        onClick={() => setSelectedUser(null)} 
+        className="md:hidden p-2 hover:bg-base-200 rounded-lg transition-colors"
+      >
+        <ArrowLeft className="w-6 h-6" />
       </button>
-      <img
-        src={user.profilePic ? user.profilePic : defaultPic}
-        className="size-14 rounded-full object-cover"
-      />
-      <div className="ml-6">
-        <h2 className="text-xl font-semibold">{user.userName}</h2>
-        <p className={isOnline ? "text-green-500" : "text-gray-400"}>
-          {isOnline ? "Online" : "Offline"}
+      <div className="avatar">
+        <div className="w-12 h-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+          <img
+            src={user.profilePic || defaultPic}
+            alt={user.userName}
+            className="object-cover"
+          />
+        </div>
+      </div>
+      <div className="flex-1">
+        <h2 className="text-lg font-semibold">{user.userName}</h2>
+        <p className={`text-sm ${isOnline ? "text-green-500" : "text-gray-400"}`}>
+          {isOnline ? "онлайн" : "не в сети"}
         </p>
       </div>
     </div>

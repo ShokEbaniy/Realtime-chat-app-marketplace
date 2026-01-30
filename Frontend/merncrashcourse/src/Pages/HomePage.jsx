@@ -15,8 +15,8 @@ const HomePage = () => {
   const cardBg = useColorModeValue("gray.200", "gray.800");
 
   const products = useProductStore((s) => s.products);
-  const loading = useProductStore((s) => s.loading); // если добавил loading в store
-  const fetchProducts = useProductStore((s) => s.fetchProducts); // если добавил fetchProducts
+  const loading = useProductStore((s) => s.loading);
+  const fetchProducts = useProductStore((s) =>s.fetchProducts);
   const removeProduct = useProductStore((s) => s.removeProduct);
 
   useEffect(() => {
@@ -24,23 +24,25 @@ const HomePage = () => {
   }, [fetchProducts]);
 
   return (
-    <Container maxW="container.lg" mt={{ base: 24, md: 14 }}>
+    <Container maxW="container.lg" mt={{ base: 4, md: 8 }} pb={{ base: 28, md: 8 }}>
       <Text fontSize="4xl" fontWeight="bold" mb={6} textAlign="center">
-        Current Products
+        товары
       </Text>
 
       {loading ? (
-        <Text textAlign="center">Loading...</Text>
+        <div className="flex justify-center items-center h-64">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
       ) : products.length === 0 ? (
         <Text textAlign="center" color={textColor} fontSize="lg">
-          No products found{" "}
+          товаров нет{" "}
           <ChakraLink
             as={NavLink}
             to="/create"
             color="teal.400"
             fontWeight="semibold"
           >
-            Create one?
+            создать?
           </ChakraLink>
         </Text>
       ) : (

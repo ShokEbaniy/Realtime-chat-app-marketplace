@@ -3,13 +3,14 @@ import { Link, NavLink } from "react-router-dom";
 import { BsFillPlusSquareFill, BsShopWindow } from "react-icons/bs";
 import { IoMoon } from "react-icons/io5";
 import { LuSun } from "react-icons/lu";
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, User, Settings, Menu, X } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore.js";
 
 const Navbar = () => {
-  // Логика темной темы для Tailwind (без Chakra)
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { logout, authUser } = useAuthStore();
+
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
@@ -25,71 +26,149 @@ const Navbar = () => {
   };
 
   return (
-    // Контейнер (Navbar)
-    <div className="max-w-[1140px] mx-auto px-4 border-b border-gray-200 dark:border-gray-700 pb-4 mb-8 bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      {/* Flex Layout */}
-      <div className="flex flex-col md:flex-row h-auto md:h-16 items-center justify-between">
-        {/* Логотип с градиентом */}
-        <div className="font-bold text-3xl md:text-2xl mt-4 md:mt-0">
-          <Link to="/">
-            <span className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 dark:from-green-200 dark:to-green-500 bg-clip-text text-transparent">
-              SaveHeal foods
+    <nav className="sticky top-0 z-40 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Логотип */}
+          <Link to="/" className="flex-shrink-0">
+            <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-500 via-green-600 to-green-700 dark:from-green-200 dark:to-green-500 bg-clip-text text-transparent">
+              SaveHeal
             </span>
           </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              to="/"
+              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
+              title="магазин"
+            >
+              <BsShopWindow size={20} className="text-gray-900 dark:text-gray-100" />
+            </Link>
+
+            {authUser && (
+              <>
+                <Link
+                  to="/create"
+                  className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
+                  title="создать товар"
+                >
+                  <BsFillPlusSquareFill size={20} className="text-gray-900 dark:text-gray-100" />
+                </Link>
+
+                <Link
+                  to="/profile"
+                  className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
+                  title="профиль"
+                >
+                  <User size={20} className="text-gray-900 dark:text-gray-100" />
+                </Link>
+
+                <Link
+                  to="/settings"
+                  className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
+                  title="настройки"
+                >
+                  <Settings size={20} className="text-gray-900 dark:text-gray-100" />
+                </Link>
+
+                <button
+                  onClick={logout}
+                  className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                  title="выйти"
+                >
+                  <LogOut size={20} className="text-red-600 dark:text-red-400" />
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
+              title={theme === "light" ? "темная тема" : "светлая тема"}
+            >
+              {theme === "light" ? (
+                <IoMoon size={20} className="text-gray-900" />
+              ) : (
+                <LuSun size={20} className="text-yellow-400" />
+              )}
+            </button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800"
+            >
+              {theme === "light" ? <IoMoon size={20} /> : <LuSun size={20} />}
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
-        <div className="w-full relative">
-          {authUser && (
-            <>
-              <LogOut
-                size={24}
-                className="size-[44px] absolute -top-2 right-[4%] text-white hover:cursor-pointer hover:text-gray-300 transition-colors duration-100"
-                onClick={logout}
-              />
-              <NavLink to="/profile">
-                <User
-                  size={24}
-                  className="size-[44px] absolute -top-2 left-[4%] text-white hover:cursor-pointer hover:text-gray-300 transition-colors duration-100"
-                />
-              </NavLink>
-              <NavLink to="/settings">
-                <Settings
-                  size={24}
-                  className="size-[44px] absolute -top-2 left-[16%] text-white hover:cursor-pointer hover:text-gray-300 transition-colors duration-100"
-                />
-              </NavLink>
-            </>
-          )}
-        </div>
 
-        {/* Правая часть (Кнопки) */}
-        <div className="flex items-center gap-8 md:gap-4 mt-8 md:mt-2">
-          {/* Кнопка Home */}
-          <Link to="/">
-            <div className="p-3 bg-gray-200 dark:bg-gray-800 rounded-md transition-all duration-300 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100">
-              <BsShopWindow size={24} className="md:size-[28px]" />
-            </div>
-          </Link>
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden py-4 space-y-2 border-t border-gray-200 dark:border-gray-700">
+            <Link
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+            >
+              <BsShopWindow size={20} />
+              <span className="text-gray-900 dark:text-gray-100">магазин</span>
+            </Link>
 
-          {/* Кнопка Create */}
-          <Link to="/create">
-            <div className="p-3 bg-gray-200 dark:bg-gray-800 rounded-md transition-all duration-300 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100">
-              <BsFillPlusSquareFill size={24} className="md:size-[28px]" />
-            </div>
-          </Link>
+            {authUser && (
+              <>
+                <Link
+                  to="/create"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <BsFillPlusSquareFill size={20} />
+                  <span className="text-gray-900 dark:text-gray-100">создать товар</span>
+                </Link>
 
-          {/* Переключатель темы */}
-          <button
-            onClick={toggleTheme}
-            className="p-3 bg-gray-200 dark:bg-gray-800 rounded-md transition-all duration-300 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
-          >
-            {theme === "light" ? <IoMoon size={24} /> : <LuSun size={24} />}
-          </button>
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <User size={20} />
+                  <span className="text-gray-900 dark:text-gray-100">профиль</span>
+                </Link>
 
-          {/* Твоя DaisyUI кнопка (оставил как есть) */}
-          <button className="btn btn-soft btn-accent btn-lg">=</button>
-        </div>
+                <Link
+                  to="/settings"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <Settings size={20} />
+                  <span className="text-gray-900 dark:text-gray-100">настройки</span>
+                </Link>
+
+                <button
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 p-3 w-full rounded-lg bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                >
+                  <LogOut size={20} className="text-red-600 dark:text-red-400" />
+                  <span className="text-red-600 dark:text-red-400">выйти</span>
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </nav>
   );
 };
 
