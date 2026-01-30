@@ -63,7 +63,8 @@ const sendMessage = async (req, res) => {
     }
     res.status(200).json({ message: newMessage });
   } catch (e) {
-    res.status(500).json({ message: e });
+    console.error("Error in sendMessage controller:", e);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 export { getUsersForSideBar, getChatMessages, sendMessage };

@@ -19,7 +19,8 @@ const __dirname = path.dirname(__filename);
 const distPath = path.resolve(__dirname, "../../Frontend/merncrashcourse/dist");
 
 connectDB();
-// Добавь limit: "10mb" (или больше)
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
